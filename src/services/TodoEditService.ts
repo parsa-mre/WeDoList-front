@@ -7,7 +7,7 @@ export const stompClient = Stomp.over(socket);
 
 export const connect = async (
     id: string | undefined,
-    callbackFunction: (message: any) => void
+    callbackFunction: (message: Stomp.Message) => void
 ) => {
     if (stompClient.connected || !id) {
         return;
@@ -20,7 +20,7 @@ export const connect = async (
 
 export const sendData = async (
     todos: ToDoDocument,
-    callbackFunction: () => void | undefined
+    callbackFunction: (message: Stomp.Message) => void | undefined
 ) => {
     console.log("Data to send:", todos);
     if (stompClient.connected) {

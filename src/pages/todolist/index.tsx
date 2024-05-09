@@ -4,6 +4,7 @@ import { sendData, connect } from "../../services/TodoEditService";
 import TodoCard from "./TodoCard";
 import { useParams } from "react-router-dom";
 import { getTodos } from "../../services/TodoService";
+import Stomp from "stompjs";
 
 function TodoList() {
     const { id: todolistID } = useParams();
@@ -13,7 +14,7 @@ function TodoList() {
 
     const [inputValue, setInputValue] = useState("");
 
-    const mergeIncommingData = (message: any) => {
+    const mergeIncommingData = (message: Stomp.Message) => {
         console.log("Received message: " + message.body);
         const incomingTodo = JSON.parse(message.body) as ToDoDocument;
         console.log("Incoming todo:", incomingTodo);
@@ -26,7 +27,7 @@ function TodoList() {
         const updatedTodos = { ...todos };
         updatedTodos.removed.push(id);
         setTodos(updatedTodos);
-        sendData(updatedTodos);
+        sendData(updatedTodos, mergeIncommingData);
     };
     const addTodo = () => {
         const updatedTodos = { ...todos };
@@ -35,14 +36,14 @@ function TodoList() {
         updatedTodos.items.push({ id: randomId, title: inputValue });
         setTodos(updatedTodos);
         setInputValue("");
-        sendData(updatedTodos);
+        sendData(updatedTodos, mergeIncommingData);
     };
 
     const completeTodo = (id: string) => {
         const updatedTodos = { ...todos };
         updatedTodos.states.push(new TodoState(id, true, Date.now()));
         setTodos(updatedTodos);
-        sendData(updatedTodos);
+        sendData(updatedTodos, mergeIncommingData);
     };
 
     const isCompletedOrRemoved = (id: string) =>
@@ -100,7 +101,9 @@ function TodoList() {
                                 )
                             )}
                     </ul>
-                    <button onClick={() => sendData(todos)}>Send Data</button>
+                    <button onClick={() => sendData(todos, mergeIncommingData)}>
+                        Send Data
+                    </button>
                 </div>
             </div>
         </div>
