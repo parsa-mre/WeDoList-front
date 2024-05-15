@@ -8,6 +8,7 @@ const HomePage = () => {
         createTodo().then((data) => {
             console.log(data);
             navigate("/todo/" + data.id);
+            window.location.href = "/todo/" + data.id;
         });
     };
 
