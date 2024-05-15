@@ -1,12 +1,24 @@
-import { createTodo } from "../../services/TodoService";
+import { createTodo, getTodos } from "../../services/TodoService";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const HomePage = () => {
     const navigate = useNavigate();
+    const [inputValue, setInputValue] = useState("");
 
     const createNewList = () => {
         createTodo().then((data) => {
             console.log(data);
+            navigate("/todo/" + data.id);
+            window.location.href = "/todo/" + data.id;
+        });
+    };
+
+    const joinList = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        getTodos(inputValue).then((data) => {
+            console.log(data);
+            if (data === null) return;
             navigate("/todo/" + data.id);
             window.location.href = "/todo/" + data.id;
         });
@@ -26,10 +38,13 @@ const HomePage = () => {
                         type="text"
                         className="px-3 p-2 h-10 w-96 rounded-lg bg-transparent border-[1px] border-surface-mixed-2-200 text-surface-mixed-600"
                         placeholder="To Do List ID"
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
                     ></input>
                     <button
                         type="submit"
                         className="p-2 w-20 h-10 bg-primary-500 rounded-full font-bold"
+                        onClick={joinList}
                     >
                         Join
                     </button>
