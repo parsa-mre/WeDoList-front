@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { ToDoDocument, TodoState } from "../../model/Todo";
 import { sendData, connect } from "../../services/TodoEditService";
 import TodoCard from "./TodoCard";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { getTodos } from "../../services/TodoService";
 import Stomp from "stompjs";
 
 function TodoList() {
     const { id: todolistID } = useParams();
+    const navigate = useNavigate();
     const [todos, setTodos] = useState<ToDoDocument>(
         new ToDoDocument(todolistID || "", [], [], [])
     );
@@ -53,6 +54,7 @@ function TodoList() {
     const setFromServer = () => {
         getTodos(todolistID).then((data) => {
             if (data === null) setTodos(new ToDoDocument("", [], [], []));
+            if (data === undefined) console.error("Data is undefined");
             setTodos(data as ToDoDocument);
         });
     };
@@ -62,6 +64,12 @@ function TodoList() {
         setFromServer();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        if (!todos.id) {
+            navigate("/");
+        }
+    }, [todos, navigate]);
 
     return (
         <div className="h-[100vh] w-full bg-surface-mixed-2-100 flex items-center justify-center">

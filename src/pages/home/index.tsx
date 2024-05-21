@@ -5,6 +5,7 @@ import { useState } from "react";
 const HomePage = () => {
     const navigate = useNavigate();
     const [inputValue, setInputValue] = useState("");
+    const [notFound, setNotFound] = useState(false);
 
     const createNewList = () => {
         createTodo().then((data) => {
@@ -18,7 +19,10 @@ const HomePage = () => {
         event.preventDefault();
         getTodos(inputValue).then((data) => {
             console.log(data);
-            if (data === null) return;
+            if (!data) {
+                setNotFound(true);
+                return;
+            }
             navigate("/todo/" + data.id);
             window.location.href = "/todo/" + data.id;
         });
@@ -58,6 +62,11 @@ const HomePage = () => {
                         Create a new To Do List.
                     </button>
                 </div>
+                {notFound && (
+                    <p className="p-2 text-red-500">
+                        To-Do List ID not found. Please try again.
+                    </p>
+                )}
                 <p className="p-2 mt-4 text-sm text-surface-600">
                     Get organized with our collaborative to-do list app! Easily
                     connect with friends, family, or colleagues using a unique
